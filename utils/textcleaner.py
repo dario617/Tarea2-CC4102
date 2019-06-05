@@ -1,10 +1,11 @@
 import re
-
+import argparse
+import os
 largos = [2**i for i in range(10,24)]
 
 def cleanAlphaNumeric(filename: str, newfilepreffix: str, limit: int):
     with open(filename, 'r', encoding='cp1252') as source:
-        with open("clean_"+newfilepreffix+"_"+filename, 'w') as dest:
+        with open(filename+"_clean_"+newfilepreffix, 'w') as dest:
             line = source.readline()
             chars = 0
             newlines = re.compile('[\t\n\r\f\v]+')
@@ -31,10 +32,71 @@ def cleanAlphaNumeric(filename: str, newfilepreffix: str, limit: int):
             dest.close()
             source.close()
 
-def generateEnglishTexts():
-    for i, largo in enumerate(largos):
-        preffix = "2^"+str(i+10)
-        print(preffix)
-        cleanAlphaNumeric("english.50MB", preffix, largo)
+def cleanNewLine(filename: str, newfilepreffix: str, limit: int):
+    with open(filename, 'r', encoding='cp1252') as source:
+        with open(filename+"_clean_"+newfilepreffix, 'w') as dest:
+            line = source.readline()
+            chars = 0
+            newlines = re.compile('[\t\n\r\f\v]+')
+            while(line and chars < limit):
+                if(newlines.fullmatch(line)):
+                    line = source.readline()
+                    continue
+                #Limpiamos saltos de linea y espacios
+                clean0 = re.sub('[\s]', '', line).lower()
+                if(chars + len(clean0) >= limit):
+                    clean0 = clean0[:limit - chars]
+                chars += len(clean0)
+                dest.write(clean0)
+                line = source.readline()
+            print(f"Texto con {chars} caracteres generado!")
+            dest.close()
+            source.close()
 
-generateEnglishTexts()
+def knowYourUniverse(filename: str):
+    universe = set()
+    with open(filename, 'r', encoding = 'ascii') as source:
+        line = source.readline()
+        while(line):
+            universe = universe.union(set(line))
+            line = source.readline()
+    print(universe)
+
+def generateTexts(which: int):
+    if which == 0:
+        for i, largo in enumerate(largos):
+            preffix = "2^"+str(i+10)
+            print(preffix)
+            cleanAlphaNumeric("english.50MB", preffix, largo)
+    else:
+        for i, largo in enumerate(largos):
+            preffix = "2^"+str(i+10)
+            print(preffix)
+            cleanNewLine("dna.50MB", preffix, largo)
+
+
+parser = argparse.ArgumentParser(description='Limpio textos porque puedo')
+parser.add_argument('palabra', metavar='p', type=str,
+                    help='dna genera los dna, eng los english, ambos genera ambos (?)\
+                    rmdna borra los dna, rmeng borra los eng y rmall los borra todillos')
+args = parser.parse_args()
+pref = ["2^"+str(i) for i in range(10,24)]
+if(args.palabra == "dna"):
+    generateTexts(1)
+elif(args.palabra == "eng"):
+    generateTexts(0)
+elif(args.palabra == "both"):
+    generateTexts(1)
+    generateTexts(0)
+elif(args.palabra == "rmdna"):
+    for pr in pref:
+        os.remove("dna.50MB_clean_"+pr)
+elif(args.palabra == "rmdeng"):
+    for pr in pref:
+        os.remove("english.50MB_clean_"+pr)
+elif(args.palabra == "rmall"):
+    for pr in pref:
+        os.remove("dna.50MB_clean_"+pr)
+        os.remove("english.50MB_clean_"+pr)
+else:
+    print("Porfa escriban bien o usen -h pa cachar")
