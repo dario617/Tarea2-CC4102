@@ -1,9 +1,9 @@
 package experiments;
-
+import arbolito.SuffixTree;
 public class Experiments {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+		SuffixTree st = new SuffixTree();
 
 	}
 
