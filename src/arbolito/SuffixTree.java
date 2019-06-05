@@ -13,39 +13,24 @@ public class SuffixTree {
 		
 	public void initialize(String text) {
 		int textLength = text.length();
-		ArrayList<Integer> suffixArray = new ArrayList<Integer>();
-		ArrayList<Integer> longestCommonPrefixArray = new ArrayList<Integer>();
+		//int[] suffixArray = new int[textLength];
+		//int[] longestCommonPrefixArray = new int[textLength];
 		
 		//TODO: Crear Suffix Array a partir del texto
-		suffixArray.add(new Integer(6));
-		suffixArray.add(new Integer(5));
-		suffixArray.add(new Integer(4));
-		suffixArray.add(new Integer(2));
-		suffixArray.add(new Integer(0));
-		suffixArray.add(new Integer(3));
-		suffixArray.add(new Integer(1));
-		
-		//TODO: Crear LCP a partir del SA
-		longestCommonPrefixArray.add(new Integer(0));
-		longestCommonPrefixArray.add(new Integer(1));
-		longestCommonPrefixArray.add(new Integer(1));
-		longestCommonPrefixArray.add(new Integer(3));
-		longestCommonPrefixArray.add(new Integer(0));
-		longestCommonPrefixArray.add(new Integer(2));
-		
-		//TODO: Init SuffixTree
-		//Se agrega el primer elemento a la raiz del arbol.
-		//S.P.G, siempre pasa que el primer nodo solo contiene '$'????????
-		Node firstNode = new Node(this.root, this.root.getDepth()+1, suffixArray.get(0));
-		root.addLink(text.substring(suffixArray.get(0)),firstNode);
+		int[]suffixArray = {6,5,4,2,0,3,1}; //hardcoded para "ababaa$"
+		//Crear LCP a partir del SA
+		int[] longestCommonPrefixArray = this.generateLCP(suffixArray, text, textLength);		//TODO: Init SuffixTree
+		//Se agrega el primer elemento a la raiz del arbol.		
+		Node firstNode = new Node(this.root, this.root.getDepth()+1, suffixArray[0]);
+		root.addLink(text.substring(suffixArray[0]),firstNode);
 		Node currentNode = firstNode;
 		for(int i=1;i<textLength; i++) {			
 			//La profundidad a la que debo insertar mi nuevo nodo
-			int lcpDepth = (int) longestCommonPrefixArray.get(i-1);
+			int lcpDepth = (int) longestCommonPrefixArray[i-1];
 			//La pos donde comienza mi nuevo sufijo
-			int stringIndex = (int) suffixArray.get(i);
+			int stringIndex = (int) suffixArray[i];
 			//El nuevo sufijo (para hashear)
-			String palabraToInsert = text.substring(suffixArray.get(i));
+			String palabraToInsert = text.substring(suffixArray[i]);
 			String newKey = palabraToInsert.substring(lcpDepth);
 			//Init nuevo nodo
 			Node newNode;			
@@ -94,5 +79,30 @@ public class SuffixTree {
 	
 	public ArrayList<String> topKQ(int k, int q){
 		return new ArrayList<String>();
+	}
+	
+	
+	//UTILS
+	private int[] generateLCP(int[] aSuffixArray, String aText, int textLength) {				    		    
+		    int[] R = new int[textLength];		    
+		    int[] L = new int[textLength-1];		   
+		    for(int i = 0; i<textLength; i++) {
+		    	R[aSuffixArray[i]] = i;
+		    	if(i<textLength-1) {
+		    		L[i] = -1;
+		    	}
+		    }		       
+		    int h = 0;
+		    for(int i = 0; i<textLength; i++) {
+		    	if(R[i]>0) {
+		    		int k = aSuffixArray[R[i]-1];
+		    		while((i+h < textLength) && (k+h < textLength) && (aText.charAt(i+h) == aText.charAt(k+h))) {
+		    			h++;
+		    		}
+		    		L[R[i]-1] = h;
+		    		h = Math.max(h-1, 0);
+		    	}
+		    }
+		    return L;		
 	}
 }
