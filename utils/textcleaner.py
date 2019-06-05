@@ -90,13 +90,25 @@ elif(args.palabra == "both"):
     generateTexts(0)
 elif(args.palabra == "rmdna"):
     for pr in pref:
-        os.remove("dna.50MB_clean_"+pr)
+        try:
+            os.remove("dna.50MB_clean_"+pr)
+        except:
+            print("El dna no estaba!")
 elif(args.palabra == "rmdeng"):
     for pr in pref:
-        os.remove("english.50MB_clean_"+pr)
+        try:
+            os.remove("english.50MB_clean_"+pr)
+        except:
+            print("el english no estaba!")
 elif(args.palabra == "rmall"):
     for pr in pref:
-        os.remove("dna.50MB_clean_"+pr)
-        os.remove("english.50MB_clean_"+pr)
+        try:
+            os.remove("dna.50MB_clean_"+pr)
+        except:
+            print("El dna no estaba!")
+        try:
+            os.remove("english.50MB_clean_"+pr)
+        except:
+            print("el english no estaba!")
 else:
     print("Porfa escriban bien o usen -h pa cachar")
