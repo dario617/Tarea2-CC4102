@@ -30,19 +30,25 @@ public class Tools {
 		}
 		
 		// Create group of suffixes
-		ArrayList<Integer> S0 = new ArrayList<>();
-		ArrayList<Integer> S1 = new ArrayList<>();
-		ArrayList<Integer> S2 = new ArrayList<>();
+		int size = text.length()/3 + 1;
+		int[] S0 = new int[size];
+		int[] S1 = new int[size];
+		int[] S2 = new int[size];
 		for (int i = 0; i < text.length(); i = i + 3) {
-			S0.add(i);
-			S1.add(i+1);
-			S2.add(i+2);
+			S0[i] = i;
+			S1[i] = i+1;
+			S2[i] = i+2;
 		}
 		
 		// Construct S12: 3-grams of S1 and S2
 		@SuppressWarnings("unchecked")
-		ArrayList<Integer> S12 = (ArrayList<Integer>) S1.clone();
-		S12.addAll(S2);
+		int[] S12 = new int[size*2];
+		for (int i = 0; i < S1.length; i++) {
+			S12[i] = S1[i];
+		}
+		for (int i = 0; i < S2.length; i++) {
+			S12[i + S1.length] = S2[i];
+		}
 		// Do radix sort and recover the rank (sorted positions)
 		ArrayList<Integer> ranks = radixSort(S12, charSet, text);
 		
@@ -51,14 +57,14 @@ public class Tools {
 		return null;
 	}
 	
-	public static ArrayList<Integer> radixSort(ArrayList<Integer> strings, HashMap<Character, Integer> charSet, String text){
+	public static ArrayList<Integer> radixSort(int[] S12, HashMap<Character, Integer> charSet, String text){
 		ArrayList<Integer> results = new ArrayList<Integer>();
 		
 		// For each caracter 
-		for(int i=0; i < charSet.size(); i++) {
-			// Initialize bucket
-			
-		}
+		// Initialize bucket
+		int[] bucketIter = countingSort();
+
+		// Para comparar pasar los $ (la posicion del caracter final)
 		
 		return results;
 	}
