@@ -68,7 +68,7 @@ public class Tools {
 		}
 		
 		// Construct S12: 3-grams of S1 and S2
-		int[] S1 = arrays.get(1), S2 = arrays.get(2);
+		int[] S0 = arrays.get(0), S1 = arrays.get(1), S2 = arrays.get(2);
 		int[] S12 = new int[S1.length + S2.length];
 		for (int i = 0; i < S1.length; i++) {
 			S12[i] = S1[i];
@@ -81,28 +81,36 @@ public class Tools {
 		int[] S12_ranks = rankingRadixSort(S12, charSet, text);
 		
 		// Sort S0 in linear time
-		// Using a mini radix sort on S1 ranks
-		
-		// S1 ranks
-		int[] S1_ranks = rankingRadixSort(S1, charSet, text);
+		// Using a mini radix sort on S1 ranks.
+
 		// Shuffle as in a radix iteration
-		int[] S0 = arrays.get(0), tmp = new int[S0.length], tmp2, S0_ranks = new int[S0.length];
+		int[] tmp = new int[S0.length], tmp2, S0_ranks = new int[S0.length];
 		int addOne = 0;
-		// In case of |S0| > |S1| because of $
+		
+		// S1 ranks; if |S0| > |S1| add the last dummy character $$$
+		int[] S1_ranks;
 		if(S0.length > S1.length) {
 			addOne = 1;
-			tmp[0] = text.length() - 1;
+			S1_ranks = new int[S0.length];
+			for (int i = 0; i < S1.length; i++) {
+				tmp[i] = S1[i];
+			}
+			tmp[S1.length] = textSize - 1;
+		}else {
+			S1_ranks = new int[S1.length];
+			for (int i = 0; i < S1.length; i++) {
+				tmp[i] = S1[i];
+			}
 		}
-		for (int i = 0; i < S0.length - addOne; i++) {
-			tmp[i + addOne] = S0[S1_ranks[i]];
+		S1_ranks = rankingRadixSort(tmp, charSet, text);
+		
+		for (int i = 0; i < S0.length; i++) {
+			tmp[i] = S0[S1_ranks[i]];
 		}
 		// Get final positions
 		tmp2 = countingSort(tmp, charSet, text);
-		if(addOne > 0) {
-			S0_ranks[S0.length - 1] = 0;
-		}
-		for (int i = 0 + addOne; i < tmp2.length; i++) {
-			S0_ranks[S1_ranks[tmp2[i] - addOne]] = i;
+		for (int i = 0; i < tmp2.length; i++) {
+			S0_ranks[S1_ranks[tmp2[i]]] = i;
 		}
 		tmp = null; tmp2 = null; // GC please clean up!!
 		
@@ -116,17 +124,75 @@ public class Tools {
 			S12_sorted_indexes[S12_ranks[i]] = S12[i];
 		}
 		
+		// Preparing for merge sort:
+		// Create pairs for S0 and S1 using the ranking of 
+		// the next character
+		// NOTE: Ranks can only be read from S12 to make 
+		// consistent comparisons
+		HashMap<Integer, Integer> pairs = new HashMap<Integer, Integer>();
+		// Put pairs from S0
+		for (int i = 0; i < S0.length - addOne; i++) {
+			// When asking for pos that belongs to S0, note: S0[i] = S12[i] -1
+			pairs.put(S12[i] - 1, S12_ranks[i]);
+		}
+		// Form pairs for S1
+		for (int i = 0; i < S1.length; i++) {
+			// When asking for pos, give the next char ranking
+			// hence i + S1.length
+			// NB: if we go OutOfBounds assign the rank of $
+			index = i+S1.length >= S12.length ? S1.length : i+S1.length;  
+			pairs.put(S12[i], S12_ranks[index]);
+		}
+		// Create triples as Strings
+		HashMap<Integer, String> triples = new HashMap<Integer, String>();
+		// Put triples by adding the ranking of the next next value
+		// Do it for S0
+		for (int i = 0; i < S0.length - addOne; i++) {
+			index = i+S1.length >= S12.length ? S1.length : i+S1.length;
+			triples.put(S12[i] - 1, text.substring(S12[i],S12[i]+1)+S12_ranks[index]);
+		}
+		// Do it for S2
+		for (int i = S1.length; i < S12.length; i++) {
+			index = S12[i]+1 >= textSize ? textSize - 1 : S12[i]+1;
+			triples.put(S12[i], text.substring(index,index+1) + S12_ranks[i-S1.length+1]);
+		}
+		
+		// Put dummy for OutOfBounds value
+		
 		int[] ans = new int[S1.length + S2.length + S0.length];
 		
 		// Merge sort pairs elements
-		int i_S12 = 0, i_S0 = 0, k= 0;
-		while(i_S0 < S0.length && i_S12 <= S12.length) {
-			if(text.charAt(S0_sorted_indexes[i_S0]) <= text.charAt(S12_sorted_indexes[i_S12])){
+		int i_S12 = 0, i_S0 = 0, k= 0; 
+		int leftPair_info, rightPair_info;
+		while(i_S0 < S0.length && i_S12 < S12.length) {			
+			if( (text.charAt(S0_sorted_indexes[i_S0])) < text.charAt(S12_sorted_indexes[i_S12])){
 				ans[k] = S0_sorted_indexes[i_S0];
 				i_S0++;
-			}else {
+			}else if((text.charAt(S0_sorted_indexes[i_S0])) > text.charAt(S12_sorted_indexes[i_S12])){
 				ans[k] = S12_sorted_indexes[i_S12];
 				i_S12++;
+			}else {
+				// Start by checking if we should compare pairs or triples
+				leftPair_info = pairs.getOrDefault(S0_sorted_indexes[i_S0], -1);
+				rightPair_info = pairs.getOrDefault(S12_sorted_indexes[i_S12], -1); 
+				if(leftPair_info == -1 || rightPair_info == -1) {
+					// Do triples comparison
+					if(triples.get(S0_sorted_indexes[i_S0]).compareTo(triples.get(S12_sorted_indexes[i_S12])) <= 0) {
+						ans[k] = S0_sorted_indexes[i_S0];
+						i_S0++;
+					}else {
+						ans[k] = S12_sorted_indexes[i_S12];
+						i_S12++;
+					}
+				}else {
+					if(leftPair_info <= rightPair_info) {
+						ans[k] = S0_sorted_indexes[i_S0];
+						i_S0++;
+					}else {
+						ans[k] = S12_sorted_indexes[i_S12];
+						i_S12++;		
+					}
+				}
 			}
 			k++;
 		}		  
@@ -223,7 +289,7 @@ public class Tools {
 	
 	public static void main(String[] args) {
 		System.out.println("Veamos si funca");
-		String text = "eating$";
+		String text = "yo tenia menos bananas$";
 		// Get the universe of strings
 		HashMap<Character, Integer> charSet = getStringUniverse(text);
 		
