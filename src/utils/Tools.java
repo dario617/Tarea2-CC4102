@@ -13,7 +13,7 @@ import com.sun.org.apache.xalan.internal.xsltc.compiler.sym;
 
 public class Tools {
 	
-	private static HashMap<Character,Integer> getStringUniverse(String text){
+	private static HashMap<Character,Integer> getStringUniverse(String text){		
 		char[] charArray = text.toCharArray();
 		Set<Character> setOfChars = new HashSet<Character>();
 		for (int i = 0; i < charArray.length; i++) {
@@ -56,14 +56,16 @@ public class Tools {
 			if((textSize - i)%3 != 0) {
 				size = size + 1;
 			}
+			System.out.printf("Size: %d \n", size);
 			int[] arr = new int[size];
 			for (int j = 0; j < arr.length; j++) {
 				index = j*3 + i;
 				arr[j] = index;
 				if(index >= textSize) {
 					arr[j] = textSize - 1;	
-				}
+				}				
 			}
+			System.out.println(Arrays.toString(arr));
 			arrays.add(i, arr);
 		}
 		
@@ -206,7 +208,7 @@ public class Tools {
 			i_S12++;
 			k++;
 		}
-		
+		System.out.println(Arrays.toString(S0_sorted_indexes));
 		return ans;
 	}
 	
@@ -289,7 +291,8 @@ public class Tools {
 	
 	public static void main(String[] args) {
 		System.out.println("Veamos si funca");
-		String text = "yo tenia menos bananas$";
+//		String text = "GTCTCTAAAAT$";
+		String text = "aaaaa$";
 		// Get the universe of strings
 		HashMap<Character, Integer> charSet = getStringUniverse(text);
 		
