@@ -1,23 +1,23 @@
 package arbolito;
 
 import java.util.ArrayList;
-
+import utils.SuffixArrayNLogN;
 public class SuffixTree {
 	
 	private Node root;
 	
 	public SuffixTree() {
 		root = new Node();
-		initialize("ababaa$");
+		initialize("banana"+"\u0006");
 	}
 		
-	public void initialize(String text) {
+	public void initialize(String text) {		
 		int textLength = text.length();
 		//int[] suffixArray = new int[textLength];
 		//int[] longestCommonPrefixArray = new int[textLength];
 		
 		//TODO: Crear Suffix Array a partir del texto
-		int[]suffixArray = {6,5,4,2,0,3,1}; //hardcoded para "ababaa$"
+		int[]suffixArray = SuffixArrayNLogN.suffixArray(text);
 		//Crear LCP a partir del SA
 		int[] longestCommonPrefixArray = this.generateLCP(suffixArray, text, textLength);		//TODO: Init SuffixTree
 		//Se agrega el primer elemento a la raiz del arbol.		
