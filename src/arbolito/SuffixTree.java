@@ -8,9 +8,9 @@ public class SuffixTree {
 	
 	private Node root;
 	
-	public SuffixTree() {
+	public SuffixTree(String text) {
 		root = new Node();
-		initialize("banana"+"\u0006");
+		initialize(text+"\u0006");
 	}
 		
 	public void initialize(String text) {		
@@ -81,16 +81,20 @@ public class SuffixTree {
 			for(String key : currentNode.getLinks().keySet()) {
 				if(key.charAt(0) == query.charAt(offset)) {
 					currentKey = key;
+					System.out.printf("Estoy buscando el str %s\n", query.substring(offset));
+					System.out.printf("Ahora soy la llave %s\n",key);
 					break;
 				}
 			}
 			// No hay matching key
 			if(Objects.isNull(currentKey)) {
+				System.out.println("no encontre matching key");
 				return 0;
 			}
 			else {
 				int keyLen = currentKey.length();
 				if(keyLen < queryLen) {
+					System.out.println("Llave menor a query");
 					if(query.substring(offset).startsWith(currentKey)) {
 						currentNode = currentNode.getLinks().get(currentKey);
 						offset += keyLen;
@@ -99,9 +103,11 @@ public class SuffixTree {
 					else {
 						return 0;
 					}
-				} // keyLen >= queryLen
+				} // keyLen > queryLen
 				else {
+					System.out.println("Llave mayor a query");
 					if(currentKey.startsWith(query.substring(offset))) {
+						offset += keyLen;
 						currentNode = currentNode.getLinks().get(currentKey);
 					}
 					else {
