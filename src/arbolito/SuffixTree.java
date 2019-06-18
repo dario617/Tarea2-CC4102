@@ -2,6 +2,8 @@ package arbolito;
 
 import java.util.ArrayList;
 import utils.SuffixArrayNLogN;
+import java.util.Objects;
+import java.util.Stack;
 public class SuffixTree {
 	
 	private Node root;
@@ -70,7 +72,66 @@ public class SuffixTree {
 	}
 	
 	public int count(String query) {
-		return 0;
+		Node currentNode = this.root;
+		int queryLen = query.length();
+		int offset = 0;
+		while(queryLen > offset) {
+			String currentKey = null;
+			// Chequeo de la primera letra de la llave
+			for(String key : currentNode.getLinks().keySet()) {
+				if(key.charAt(0) == query.charAt(offset)) {
+					currentKey = key;
+					break;
+				}
+			}
+			// No hay matching key
+			if(Objects.isNull(currentKey)) {
+				return 0;
+			}
+			else {
+				int keyLen = currentKey.length();
+				if(keyLen < queryLen) {
+					if(query.substring(offset).startsWith(currentKey)) {
+						currentNode = currentNode.getLinks().get(currentKey);
+						offset += keyLen;
+						continue;
+					}
+					else {
+						return 0;
+					}
+				} // keyLen >= queryLen
+				else {
+					if(currentKey.startsWith(query.substring(offset))) {
+						currentNode = currentNode.getLinks().get(currentKey);
+					}
+					else {
+						return 0;
+					}
+				}
+			}
+		}
+		int counter = 0;
+		// El nodo actual era una hoja
+		if(currentNode.getValue() >= 0) {
+			counter += 1;
+			return counter;
+		}
+		Stack<Node> stack = new Stack<Node>();
+		for(Node nodo : currentNode.getLinks().values()) {
+			stack.push(nodo);
+		}
+		while(!stack.isEmpty()) {
+			currentNode = stack.pop();
+			if(currentNode.getValue() >= 0) {
+				counter += 1;
+			}
+			else{
+				for(Node nodo : currentNode.getLinks().values()) {
+				stack.push(nodo);
+				}
+			}
+		}
+		return counter;
 	}
 	
 	public ArrayList<Integer> locate(String query) {
