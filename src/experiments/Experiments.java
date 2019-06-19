@@ -1,4 +1,5 @@
 package experiments;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.FilenameFilter;
@@ -6,7 +7,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
+import com.sun.istack.internal.logging.Logger;
 import com.sun.xml.internal.ws.api.pipe.NextAction;
+
 
 import arbolito.SuffixTree;
 
@@ -244,6 +247,7 @@ public class Experiments {
 		//System.out.println(st.count("zorro"));
 		//System.out.println(st.count("porro"));
 		//System.out.println(st.count("cifuentes"));
+
 
 	}
 

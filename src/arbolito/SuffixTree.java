@@ -3,6 +3,7 @@ package arbolito;
 import java.util.ArrayList;
 import utils.SuffixArrayNLogN;
 import java.util.Objects;
+import java.util.Random;
 import java.util.Stack;
 public class SuffixTree {
 	
@@ -10,17 +11,18 @@ public class SuffixTree {
 	
 	public SuffixTree(String text) {
 		root = new Node();
-		initialize(text+"\u0006");
+		StringBuilder sb = new StringBuilder();
+		sb.append(text);
+		sb.append("\u0006");
+		initialize(sb.toString());
 	}
 		
-	public void initialize(String text) {		
-		int textLength = text.length();
-		//int[] suffixArray = new int[textLength];
-		//int[] longestCommonPrefixArray = new int[textLength];
-		
-		//TODO: Crear Suffix Array a partir del texto
+	public void initialize(String text) {
+		System.out.println("begin initialize...");
+		int textLength = text.length();		
+		// Se genera el Suffix Array
 		int[]suffixArray = SuffixArrayNLogN.suffixArray(text);
-		//Crear LCP a partir del SA
+		// Se genera el LCP a partir del Suffix Array
 		int[] longestCommonPrefixArray = this.generateLCP(suffixArray, text, textLength);		//TODO: Init SuffixTree
 		//Se agrega el primer elemento a la raiz del arbol.		
 		Node firstNode = new Node(this.root, this.root.getDepth()+1, suffixArray[0]);
@@ -49,23 +51,53 @@ public class SuffixTree {
 				currentNode = newNode;
 			} else{ //lcpDepth > parent.depth	
 				//generar 2 substrings		
-				String llaveOriginal = text.substring(currentNode.getValue()+currentNode.getParent().getDepth());
-				String subIzq = llaveOriginal.substring(0,lcpDepth-currentNode.getParent().getDepth());
-				String subDer = llaveOriginal.substring(lcpDepth-currentNode.getParent().getDepth());
-				//generar una copia del cursor (currentNode), linkear a cursor con substr derecho como llave
-				Node currentCopy = new Node(currentNode, currentNode.getDepth(), currentNode.getValue());
-				currentNode.addLink(subDer, currentCopy);				
-				//rehash cursor con substr izquierdo como llave (crear hash nuevo, remover antiguo)
-				currentNode.getParent().addLink(subIzq, currentNode);
-				currentNode.getParent().removeLink(llaveOriginal);
-				//setear cursor como nodo interno y nueva depth = LCP
-				currentNode.setInner();
-				currentNode.setDepth(lcpDepth);
-				//anexar nodo nuevo a agregar, setear cursor en nuevo nodo.
-				newNode = new Node(currentNode,(textLength-stringIndex),
-						stringIndex); 				
-				currentNode.addLink(newKey, newNode);
-				currentNode = newNode;
+				String llaveOriginal;
+				if(currentNode.getValue() == -1) { // Soy nohoja, busco a alguien para saber cual es mi hoja
+					// Elegimos un nodo al azar dentro del nodo actual
+					Random r = new Random();
+					Node actNode = currentNode;
+					while(actNode.getValue() == -1) {
+						Object[] allKeys = actNode.getLinks().keySet().toArray();
+						String randomKey = (String) allKeys[r.nextInt(allKeys.length)];
+						actNode = actNode.getLinks().get(randomKey);
+					}
+					int initVal = actNode.getValue()+currentNode.getParent().getDepth();
+					int endVal = actNode.getValue() + currentNode.getDepth();
+					llaveOriginal = text.substring(initVal, endVal);
+					String subIzq = llaveOriginal.substring(0,lcpDepth - currentNode.getParent().getDepth());
+					String subDer = llaveOriginal.substring(lcpDepth - currentNode.getParent().getDepth());
+					// Generamos un nuevo nodo interno
+					Node babyInnerNode = new Node(currentNode.getParent(), subIzq.length() + currentNode.getParent().getDepth(), currentNode.getValue());
+					babyInnerNode.setInner();
+					// Este nuevo nodo, almacena la nueva llave a insertar, por lo que la generamos
+					newNode = new Node(babyInnerNode, (textLength-stringIndex), stringIndex);
+					babyInnerNode.addLink(newKey, newNode);
+					// Ahora, nuestro nuevo nodo es intermedio entre current y el padre de current
+					babyInnerNode.addLink(subDer, currentNode);
+					currentNode.getParent().removeLink(llaveOriginal);
+					currentNode.getParent().addLink(subIzq, babyInnerNode);
+					currentNode.setParent(babyInnerNode);
+					currentNode = newNode;					
+				}
+				else {
+					llaveOriginal = text.substring(currentNode.getValue()+currentNode.getParent().getDepth());
+					String subIzq = llaveOriginal.substring(0,lcpDepth-currentNode.getParent().getDepth());
+					String subDer = llaveOriginal.substring(lcpDepth-currentNode.getParent().getDepth());
+					//generar una copia del cursor (currentNode), linkear a cursor con substr derecho como llave
+					Node currentCopy = new Node(currentNode, currentNode.getDepth(), currentNode.getValue());
+					currentNode.addLink(subDer, currentCopy);				
+					//rehash cursor con substr izquierdo como llave (crear hash nuevo, remover antiguo)
+					currentNode.getParent().addLink(subIzq, currentNode);
+					currentNode.getParent().removeLink(llaveOriginal);
+					//setear cursor como nodo interno y nueva depth = LCP
+					currentNode.setInner();
+					currentNode.setDepth(lcpDepth);
+					//anexar nodo nuevo a agregar, setear cursor en nuevo nodo.
+					newNode = new Node(currentNode,(textLength-stringIndex),
+							stringIndex); 				
+					currentNode.addLink(newKey, newNode);
+					currentNode = newNode;
+				}
 			}
 		}
 		System.out.println("init Terminated");
@@ -81,20 +113,16 @@ public class SuffixTree {
 			for(String key : currentNode.getLinks().keySet()) {
 				if(key.charAt(0) == query.charAt(offset)) {
 					currentKey = key;
-					System.out.printf("Estoy buscando el str %s\n", query.substring(offset));
-					System.out.printf("Ahora soy la llave %s\n",key);
 					break;
 				}
 			}
 			// No hay matching key
-			if(Objects.isNull(currentKey)) {
-				System.out.println("no encontre matching key");
+			if(Objects.isNull(currentKey)) {				
 				return 0;
 			}
 			else {
 				int keyLen = currentKey.length();
-				if(keyLen < queryLen) {
-					System.out.println("Llave menor a query");
+				if(keyLen < queryLen) {					
 					if(query.substring(offset).startsWith(currentKey)) {
 						currentNode = currentNode.getLinks().get(currentKey);
 						offset += keyLen;
@@ -104,8 +132,7 @@ public class SuffixTree {
 						return 0;
 					}
 				} // keyLen > queryLen
-				else {
-					System.out.println("Llave mayor a query");
+				else {					
 					if(currentKey.startsWith(query.substring(offset))) {
 						offset += keyLen;
 						currentNode = currentNode.getLinks().get(currentKey);

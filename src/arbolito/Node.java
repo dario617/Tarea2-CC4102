@@ -44,6 +44,8 @@ public class Node {
 
 	public void setLinks(HashMap<String, Node> links) {this.links = links;}
 	
+	public void setParent(Node par) {this.parent = par;}
+	
 	public void addLink(String s, Node n) {links.put(s, n);}
 	public void removeLink(String s) {links.remove(s);}
 	public Node getParent() {return this.parent;}
