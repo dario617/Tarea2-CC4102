@@ -6,15 +6,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
-import com.sun.xml.internal.ws.api.pipe.NextAction;
-
 import arbolito.SuffixTree;
 
 public class Experiments {
 	
 	private static final String filesFolder = "./";
 	private static Logger log;
-	private static final char bottom = '$';
+	private static final char bottom = '\u0006';
 	private static ArrayList<String> randomStrings;
 	private static final int randomCharLength = 5;
 	
@@ -199,13 +197,13 @@ public class Experiments {
 		// english.50
 		File[] englishFiles = dir.listFiles(new FilenameFilter() {
 		    public boolean accept(File dir, String name) {
-		        return name.startsWith("english") && name.endsWith("50MB");
+		        return name.startsWith("english");
 		    }
 		});
 		// dna.50
 		File[] dnaFiles = dir.listFiles(new FilenameFilter() {
 		    public boolean accept(File dir, String name) {
-		        return name.startsWith("dna") && name.endsWith("50MB");
+		        return name.startsWith("dna");
 		    }
 		});
 		
