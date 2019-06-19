@@ -9,8 +9,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.sym;
-
 public class Tools {
 	
 	private static HashMap<Character,Integer> getStringUniverse(String text){		

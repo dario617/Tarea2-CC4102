@@ -1,14 +1,6 @@
 package utils;
 
-// source https://leetcode.com/problems/longest-palindromic-substring/discuss/3209/onlogn-suffix-array-solution-clear-explanation
-import static org.junit.jupiter.api.Assumptions.assumingThat;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
