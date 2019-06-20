@@ -74,7 +74,7 @@ public class SuffixTree {
 					Node actNode = currentNode;
 					Node[] currentLinks;
 					while (actNode.getValue() == -1) {
-						currentLinks = actNode.getLinks();
+						currentLinks = actNode.getChildren();
 						for (int j = 0; j < currentLinks.length; j++) {
 							if(currentLinks[j] != null) {
 								actNode = currentLinks[j];
@@ -141,64 +141,73 @@ public class SuffixTree {
 	}
 	
 	public int count(String query) {
-//		Node currentNode = this.root;
-//		int queryLen = query.length();
-//		int offset = 0;
-//		while (queryLen > offset) {
-//			String currentKey = null;
-//			// Chequeo de la primera letra de la llave
-//			for (String key : currentNode.getLinks().keySet()) {
-//				if (key.charAt(0) == query.charAt(offset)) {
-//					currentKey = key;
-//					break;
-//				}
-//			}
-//			// No hay matching key
-//			if (Objects.isNull(currentKey)) {
-//				return 0;
-//			} else {
-//				int keyLen = currentKey.length();
-//				if (keyLen < queryLen) {
-//					if (query.substring(offset).startsWith(currentKey)) {
-//						currentNode = currentNode.getLinks().get(currentKey);
-//						offset += keyLen;
-//						continue;
-//					} else {
-//						return 0;
-//					}
-//				} // keyLen > queryLen
-//				else {
-//					if (currentKey.startsWith(query.substring(offset))) {
-//						offset += keyLen;
-//						currentNode = currentNode.getLinks().get(currentKey);
-//					} else {
-//						return 0;
-//					}
-//				}
-//			}
-//		}
-//		int counter = 0;
-//		// El nodo actual era una hoja
-//		if (currentNode.getValue() >= 0) {
-//			counter += 1;
-//			return counter;
-//		}
-//		Stack<Node> stack = new Stack<Node>();
-//		for (Node nodo : currentNode.getLinks().values()) {
-//			stack.push(nodo);
-//		}
-//		while (!stack.isEmpty()) {
-//			currentNode = stack.pop();
-//			if (currentNode.getValue() >= 0) {
-//				counter += 1;
-//			} else {
-//				for (Node nodo : currentNode.getLinks().values()) {
-//					stack.push(nodo);
-//				}
-//			}
-//		}
-		//return counter;
-		return 0;
+		Node currentNode = this.root;
+		int queryLen = query.length();
+		int offset = 0;
+		while (queryLen > offset) {
+			// Chequeo de la primera letra de lo restante de la consulta
+			int[][] currentLinks = currentNode.getLinks();
+			// Si la letra buscada no esta en el universo, no existen coincidencias
+			if(!universe.containsKey(query.charAt(offset))) {
+				return 0;
+			}
+			int pos = universe.get(query.charAt(offset));
+			if(currentLinks[pos][0] == -1) {
+				// No hay llave coincidente
+				return 0;
+			}
+			else {
+				int init = currentLinks[pos][0];
+				int end = currentLinks[pos][1] + 1;
+				int keyLen = end - init;
+				String key = text.substring(init, end);
+				String subquery = query.substring(offset);
+				if (keyLen < queryLen - offset) {
+					if (subquery.startsWith(key)) {
+						currentNode = currentNode.getChildren()[pos];
+						offset += keyLen;
+						continue;
+					} else {
+						return 0;
+					}
+				} // keyLen >= queryLen
+				else {
+					if (key.startsWith(subquery)) {
+						offset += keyLen;
+						currentNode = currentNode.getChildren()[pos];
+					} else {
+						return 0;
+					}
+				}
+			}
+		}
+		int counter = 0;
+		// El nodo actual era una hoja
+		if (currentNode.getValue() >= 0) {
+			counter += 1;
+			return counter;
+		}
+		Stack<Node> stack = new Stack<Node>();
+		// Metemos todos lo nodos de currentNode al stack
+		for (int i = 0; i < currentNode.getChildren().length; i++) {
+			if(!Objects.isNull(currentNode.getChildren()[i])) {
+				stack.push(currentNode.getChildren()[i]);
+			}
+		}
+		while (!stack.isEmpty()) {
+			currentNode = stack.pop();
+			if (currentNode.getValue() >= 0) {
+				counter += 1;
+			} 
+			else {
+				for (int i = 0; i < currentNode.getChildren().length; i++) {
+					if(!Objects.isNull(currentNode.getChildren()[i])) {
+						stack.push(currentNode.getChildren()[i]);
+					}
+				}
+			}
+		}
+		return counter;
 	}
 
 	public ArrayList<Integer> locate(String query) {
