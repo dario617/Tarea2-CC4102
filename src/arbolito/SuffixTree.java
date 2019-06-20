@@ -94,7 +94,7 @@ public class SuffixTree {
 					
 					
 					// Generamos un nuevo nodo interno
-					int newKeyLength1 = subIzq2 - initVal;
+					int newKeyLength1 = subIzq2 - initVal + 1;
 					Node babyInnerNode = new Node(currentNode.getParent(), 
 							 newKeyLength1 + currentNode.getParent().getDepth(), currentNode.getValue(), universe.size());
 					babyInnerNode.setInner();
