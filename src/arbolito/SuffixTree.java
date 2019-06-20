@@ -102,8 +102,8 @@ public class SuffixTree {
 					// Este nuevo nodo, almacena la nueva llave a insertar, por lo que la generamos
 					newNode = new Node(babyInnerNode, (textLength - stringIndex), stringIndex, universe.size());
 					
-					babyInnerNode.addLink(universe.get(text.charAt(initVal)), initVal, subIzq2, newNode);
-					
+					//babyInnerNode.addLink(universe.get(text.charAt(initVal)), initVal, subIzq2, newNode);
+					babyInnerNode.addLink(universe.get(text.charAt(stringIndex + lcpDepth)), stringIndex + lcpDepth, textLength - 1, newNode);
 					// Ahora, nuestro nuevo nodo es intermedio entre current y el padre de current
 					babyInnerNode.addLink(universe.get(text.charAt(subDer1)), subDer1, endVal, currentNode);
 					
@@ -217,7 +217,36 @@ public class SuffixTree {
 	public ArrayList<String> topKQ(int k, int q) {
 		return new ArrayList<String>();
 	}
-
+	
+	
+	public boolean checkSuffixTree() {				
+		Node startingNode = this.root;
+		int[] originalSA = SuffixArrayNLogN.suffixArray(this.text);
+		Stack<Node> valueStack = new Stack<Node>();
+		ArrayList<Integer> SA = new ArrayList<Integer>();
+		valueStack.push(startingNode);
+		while(!valueStack.isEmpty()) {
+			Node currentNode = valueStack.pop();
+			if(currentNode.getValue() == -1) {
+				//recorrer hijos en orden Lex y pushearlos
+				for(Node n : currentNode.getChildren()) {
+					if(n!=null) valueStack.push(n);
+				}
+			} else {
+				SA.add(new Integer(currentNode.getValue()));
+			}
+		}
+		System.out.println("Verificando SA reconstruido:");
+		int saLen = originalSA.length;
+		for(int i = 0; i<saLen; i++) {			
+			if((int) SA.get(i) != originalSA[saLen - 1 - i]) {
+				System.out.println("failed");
+				return false;
+			}
+		}
+		System.out.println("OK!");
+		return true;
+	}
 	// UTILS
 	private int[] generateLCP(int[] aSuffixArray, String aText, int textLength) {
 		int[] R = new int[textLength];

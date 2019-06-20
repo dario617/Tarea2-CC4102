@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import arbolito.SuffixTree;
-
+import experiments.Logger;
 public class Experiments {
 	
-	private static final String filesFolder = "./";
+	private static final String filesFolder = "./utils";
 	private static Logger log;
 	private static final char bottom = '\u0006';
 	private static ArrayList<String> randomStrings;
@@ -49,6 +49,7 @@ public class Experiments {
 			// Create suffix tree
 			log.startTest("Initialize suffix tree");
 			SuffixTree suffixtree = new SuffixTree(text);
+			suffixtree.checkSuffixTree();
 			// TODO: get size of suffix tree
 			log.logInfo("Initialize suffix tree", "Total size: "); //+st.getSize());
 			log.stopTest("Initialize suffix tree");
@@ -124,6 +125,7 @@ public class Experiments {
 			// Create suffix tree
 			log.startTest("Initialize suffix tree");
 			SuffixTree suffixtree = new SuffixTree(text);
+			suffixtree.checkSuffixTree();
 			// TODO: get size of suffix tree
 			log.logInfo("Initialize suffix tree", "Total size: "); //+st.getSize());
 			log.stopTest("Initialize suffix tree");
@@ -215,7 +217,7 @@ public class Experiments {
 			log.startTest("File "+englishFiles[i].getName(), true);
 			doEnglish(englishFiles[i]);
 			log.stopTest("File "+englishFiles[i].getName());
-			System.gc();
+			//System.gc();
 		}
 		log.stopTest("English files");
 		
@@ -226,7 +228,7 @@ public class Experiments {
 			log.startTest("File "+englishFiles[i].getName(), true);
 			doDNA(dnaFiles[i]);
 			log.stopTest("File "+englishFiles[i].getName());
-			System.gc();
+			//System.gc();
 		}
 		log.stopTest("DNA files");
 	}
@@ -235,17 +237,12 @@ public class Experiments {
 		
 		// Initialize
 		String logName = System.currentTimeMillis() + ".log";
-		log = new Logger(filesFolder + logName, "SuffixTree", logName);
+		//log = new Logger(filesFolder + logName, "SuffixTree", logName);
 		
 		// Run!
-		doExperiments();
-		
-		log.close();
-		
-		//SuffixTree st = new SuffixTree("aninanina");
-		//System.out.println(st.count("zorro"));
-		//System.out.println(st.count("porro"));
-		//System.out.println(st.count("cifuentes"));
+		//doExperiments();		
+		//log.close();
+
 
 
 	}
