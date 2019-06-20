@@ -31,12 +31,14 @@ public class Logger {
 	}
 	
 	public void logInfo(String test, String info) {
+		System.out.println(testName+"::"+test+"::Info::"+info);
 		this.bw.println(testName+"::"+test+"::Info::"+info);
 	}
 	
 	public void stopTest(String test) {
 		long endTime = System.currentTimeMillis();
 		long diff = endTime - testTimes.get(test);
+		System.out.println(testName+"::"+test+"::Finished::on:: "+diff+"ms");
 		this.bw.println(testName+"::"+test+"::Finished::on:: "+diff+"ms");
 		this.bw.flush();
 	}

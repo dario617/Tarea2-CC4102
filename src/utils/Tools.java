@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class Tools {
 	
-	private static HashMap<Character,Integer> getStringUniverse(String text){		
+	public static HashMap<Character,Integer> getStringUniverse(String text){		
 		char[] charArray = text.toCharArray();
 		Set<Character> setOfChars = new HashSet<Character>();
 		for (int i = 0; i < charArray.length; i++) {

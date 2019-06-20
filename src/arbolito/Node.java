@@ -9,27 +9,23 @@ public class Node {
 	 * 	depth: profundidad del nodo en el arbol
 	 * 	parent: Nodo padre
 	 * */
-	private HashMap<String, Node> links;
+	private int[][] links;
+	private Node[] children;
 	private int value;
 	private int depth;
 	private Node parent;
 	
-	public Node(Node parent, int depth, int value, HashMap<String, Node> links) {
+	public Node(Node parent, int depth, int value, int size) {
 		this.parent = parent;
 		this.depth = depth;
 		this.value = value;
-		this.links = links;
-	}
-	public Node(Node parent, int depth, int value) {
-		this.parent = parent;
-		this.depth = depth;
-		this.value = value;
-		this.links = new HashMap<String, Node>();
+		this.links = new int[size][2];
+		this.children = new Node[size];
 	}
 	
 	//crea un nodo raiz
-	public Node() {
-		this(null, 0, -1);
+	public Node(int size) {
+		this(null, 0, -1, size);
 	}
 	
 	public int getValue() {return this.value;}
@@ -40,12 +36,26 @@ public class Node {
 	
 	public int getDepth() {return this.depth;}
 	public void setDepth(int newDepth) {this.depth = newDepth;}
-	public HashMap<String, Node> getLinks() {return this.links;}
-
-	public void setLinks(HashMap<String, Node> links) {this.links = links;}
 	
-	public void addLink(String s, Node n) {links.put(s, n);}
-	public void removeLink(String s) {links.remove(s);}
+	public void setParent(Node par) {this.parent = par;}
+	
+	public void addLink(int pos, int index1, int index2, Node n) {
+		links[pos][0] = index1;
+		links[pos][1] = index2;
+		children[pos] = n;
+	}
+	
+	public void removeLink(int pos) {
+		links[pos][0] = -1;
+		links[pos][1] = -1;
+		children[pos] = null;
+	}
+	
+	public Node[] getLinks() {
+		return children;
+	}
+	
 	public Node getParent() {return this.parent;}
-	public int size() {return links.size();}
+	public int size() {return links.length;}
+	
 }

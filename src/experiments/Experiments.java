@@ -1,4 +1,5 @@
 package experiments;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.FilenameFilter;
@@ -21,7 +22,7 @@ public class Experiments {
 	}
 	
 	public static String getRandomPattern(int length, boolean dna) {
-		String universe= dna ? "ACTG" : "abcdefghijklmnopqrstuvwxyz";
+		String universe= dna ? "actg" : "abcdefghijklmnopqrstuvwxyz0123456789";
         StringBuilder sb = new StringBuilder();
         Random rnd = new Random();
         while (sb.length() < length) { // length of the random string.
@@ -41,7 +42,7 @@ public class Experiments {
 				sb.append((char)index);	
 			}
 			// Add bottom element
-			sb.append(bottom);
+			//sb.append(bottom);
 			
 			String text = sb.toString();
 						
@@ -214,6 +215,7 @@ public class Experiments {
 			log.startTest("File "+englishFiles[i].getName(), true);
 			doEnglish(englishFiles[i]);
 			log.stopTest("File "+englishFiles[i].getName());
+			System.gc();
 		}
 		log.stopTest("English files");
 		
@@ -224,6 +226,7 @@ public class Experiments {
 			log.startTest("File "+englishFiles[i].getName(), true);
 			doDNA(dnaFiles[i]);
 			log.stopTest("File "+englishFiles[i].getName());
+			System.gc();
 		}
 		log.stopTest("DNA files");
 	}
@@ -235,13 +238,15 @@ public class Experiments {
 		log = new Logger(filesFolder + logName, "SuffixTree", logName);
 		
 		// Run!
-		//doExperiments();
+		doExperiments();
 		
-		SuffixTree st = new SuffixTree("abacbadcbaedcbafedcbagfedcbahijk");
-		System.out.println(st.count("ab"));
+		log.close();
+		
+		//SuffixTree st = new SuffixTree("aninanina");
 		//System.out.println(st.count("zorro"));
 		//System.out.println(st.count("porro"));
 		//System.out.println(st.count("cifuentes"));
+
 
 	}
 
