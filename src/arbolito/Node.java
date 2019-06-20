@@ -51,7 +51,11 @@ public class Node {
 		children[pos] = null;
 	}
 	
-	public Node[] getLinks() {
+	public int[][] getLinks(){
+		return links;
+	}
+	
+	public Node[] getChildren() {
 		return children;
 	}
 	
