@@ -164,9 +164,30 @@ public class SuffixTree {
 				}
 			}
 		}
+		initCount();
 		System.out.println("init Terminated");
 	}
 	
+	private void initCount() {
+		initCountRec(this.root);
+	}
+	
+	private int initCountRec(Node node) {
+		int n = 0;
+		// Si soy hoja
+		if(node.getValue() >= 0) {
+			node.setNBChildren(1);
+			return 1;
+		}
+		// Si no soy hoja
+		for (int i = 0; i < node.getChildren().length; i++) {
+			if(!Objects.isNull(node.getChildren()[i]))
+				n += initCountRec(node.getChildren()[i]);
+		}
+		node.setNBChildren(n);
+		return n;
+	}
+
 	public int count(String query) {
 		Node currentNode = this.root;
 		int queryLen = query.length();
