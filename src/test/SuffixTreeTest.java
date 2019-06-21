@@ -67,7 +67,7 @@ class SuffixTreeTest {
 		ArrayList<Integer> ans;
 		
 		SuffixTree st1 = new SuffixTree(s1);
-		String[] queries = {"orro","en"};
+		String[] queries = {"orro","en","el","u"};
 		for (int i = 0; i < queries.length; i++) {
 			ans = st1.locate(queries[i]);
 			actual = getActualLocate(s2, queries[i]);

@@ -1,6 +1,7 @@
 package arbolito;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import utils.SuffixArrayNLogN;
@@ -11,10 +12,35 @@ import java.util.Random;
 import java.util.Stack;
 
 public class SuffixTree {
+	
+	private class MyPair implements Comparable<MyPair>{
+		private int first;
+		private int second;
+		
+		public MyPair(int first, int second){
+			this.first = first;
+			this.second = second;
+		}
 
+		@Override
+		public int compareTo(MyPair o) {
+			// TODO Auto-generated method stub
+			int cmp;
+			if (first> o.first)
+			   cmp = +1;
+			else if (first< o.first)
+			   cmp = -1;
+			else
+			   cmp = 0;
+			return cmp;
+		}
+		
+	}
+	
 	private Node root;
 	private String text;
 	private HashMap<Character, Integer> universe;
+	private int qkPos;
 
 	public SuffixTree(String text) {
 		StringBuilder sb = new StringBuilder();
@@ -283,9 +309,75 @@ public class SuffixTree {
 	}
 
 	public ArrayList<String> topKQ(int k, int q) {
-		return new ArrayList<String>();
+		
+		int[][] indices = new int[text.length()][2];
+		int[] count = new int[text.length()];
+		qkPos = 0;
+		
+		// FAILSAFE
+		if(q > text.length()) {
+			return null;
+		}
+		
+		topKQHelper(root, q, indices, count);
+		
+		// Get top K
+		MyPair[] myPairs = new MyPair[qkPos];
+		for (int i = 0; i < myPairs.length; i++) {
+			myPairs[i] = new MyPair(count[i], i);
+		}
+		Arrays.sort(myPairs);
+		
+		int init;
+		int end;
+		ArrayList<String> ans = new ArrayList<String>();
+		// Give me K, while there are enough values
+		for (int i = 0; i < k && i < qkPos; i++) {
+			init = indices[myPairs[i].second][0];
+			end = indices[myPairs[i].second][1];
+			ans.add(text.substring(init,end+1));
+		}
+		
+		return ans;
 	}
 	
+	private void topKQHelper(Node n, int q, int[][] ans, int[] count) {
+		// If current branch is smaller than the requested Q
+		if(n.getDepth() < q) {
+			// Do a recursive step on children
+			Node[] children = n.getChildren();
+			for (int i = 0; i < children.length; i++) {
+				topKQHelper(children[i], q, ans, count);
+			}
+		// Else we can add up the results
+		}else {
+			// Find the index of this string
+			
+			// Get a child with a valid index
+			Node current = n;
+			Node[] currentChildren;
+			while(current.getValue() != -1) {
+				currentChildren = n.getChildren();
+				for (int i = 0; i < currentChildren.length; i++) {
+					if(currentChildren[i] != null) {
+						current = currentChildren[i];
+						break;
+					}
+				}
+			}
+			
+			int stringInit = current.getValue();
+			int stringEnd = stringInit + q; // Inclusive value
+			
+			ans[qkPos][0] = stringInit;
+			ans[qkPos][1] = stringEnd;
+			
+			count[qkPos] = n.setNBChildren();
+			
+			qkPos++;
+		}
+		return;
+	}
 	
 	public boolean checkSuffixTree() {				
 		Node startingNode = this.root;
