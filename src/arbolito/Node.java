@@ -11,6 +11,7 @@ public class Node {
 	 * */
 	private int[][] links;
 	private Node[] children;
+	private int nbchildren;
 	private int value;
 	private int depth;
 	private Node parent;
@@ -21,6 +22,7 @@ public class Node {
 		this.value = value;
 		this.links = new int[size][2];
 		this.children = new Node[size];
+		this.nbchildren = -1;
 		initArrays();
 	}
 	
@@ -66,6 +68,10 @@ public class Node {
 	public Node[] getChildren() {
 		return children;
 	}
+	
+	public void setNBChildren(int n) {this.nbchildren = n;}
+	
+	public int getNBChildren() {return this.nbchildren;}
 	
 	public Node getParent() {return this.parent;}
 	public int size() {return links.length;}
