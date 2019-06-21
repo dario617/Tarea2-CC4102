@@ -104,6 +104,7 @@ public class SuffixTree {
 					
 					//babyInnerNode.addLink(universe.get(text.charAt(initVal)), initVal, subIzq2, newNode);
 					babyInnerNode.addLink(universe.get(text.charAt(stringIndex + lcpDepth)), stringIndex + lcpDepth, textLength - 1, newNode);
+					
 					// Ahora, nuestro nuevo nodo es intermedio entre current y el padre de current
 					babyInnerNode.addLink(universe.get(text.charAt(subDer1)), subDer1, endVal, currentNode);
 					
@@ -211,7 +212,74 @@ public class SuffixTree {
 	}
 
 	public ArrayList<Integer> locate(String query) {
-		return new ArrayList<Integer>();
+		
+		Node currentNode = this.root;
+		int queryLen = query.length();
+		int offset = 0;
+		ArrayList<Integer> ans = new ArrayList<Integer>();
+		while (queryLen > offset) {
+			// Chequeo de la primera letra de lo restante de la consulta
+			int[][] currentLinks = currentNode.getLinks();
+			// Si la letra buscada no esta en el universo, no existen coincidencias
+			if(!universe.containsKey(query.charAt(offset))) {
+				return ans;
+			}
+			int pos = universe.get(query.charAt(offset));
+			if(currentLinks[pos][0] == -1) {
+				// No hay llave coincidente
+				return ans;
+			}
+			else {
+				int init = currentLinks[pos][0];
+				int end = currentLinks[pos][1] + 1;
+				int keyLen = end - init;
+				String key = text.substring(init, end);
+				String subquery = query.substring(offset);
+				if (keyLen < queryLen - offset) {
+					if (subquery.startsWith(key)) {
+						currentNode = currentNode.getChildren()[pos];
+						offset += keyLen;
+						continue;
+					} else {
+						return ans;
+					}
+				} // keyLen >= queryLen
+				else {
+					if (key.startsWith(subquery)) {
+						offset += keyLen;
+						currentNode = currentNode.getChildren()[pos];
+					} else {
+						return ans;
+					}
+				}
+			}
+		}
+		// El nodo actual era una hoja
+		if (currentNode.getValue() >= 0) {
+			ans.add(currentNode.getValue());
+			return ans;
+		}
+		Stack<Node> stack = new Stack<Node>();
+		// Metemos todos lo nodos de currentNode al stack
+		for (int i = 0; i < currentNode.getChildren().length; i++) {
+			if(!Objects.isNull(currentNode.getChildren()[i])) {
+				stack.push(currentNode.getChildren()[i]);
+			}
+		}
+		while (!stack.isEmpty()) {
+			currentNode = stack.pop();
+			if (currentNode.getValue() >= 0) {
+				ans.add(currentNode.getValue());
+			} 
+			else {
+				for (int i = 0; i < currentNode.getChildren().length; i++) {
+					if(!Objects.isNull(currentNode.getChildren()[i])) {
+						stack.push(currentNode.getChildren()[i]);
+					}
+				}
+			}
+		}
+		return ans;
 	}
 
 	public ArrayList<String> topKQ(int k, int q) {
@@ -247,6 +315,56 @@ public class SuffixTree {
 		System.out.println("OK!");
 		return true;
 	}
+	
+	public boolean checkSuffixTreeOnLinks() {
+		int[] originalSA = SuffixArrayNLogN.suffixArray(this.text);
+		StringBuilder sb = new StringBuilder();
+		Node current;
+		int[][] currentLinks;
+		Node[] childs;
+		int index, position;
+		for (int i = 0; i < originalSA.length; i++) {
+			String currentQuery = this.text.substring(originalSA[i]);
+			// reset buffer
+			sb.setLength(0);
+			
+			// Look into the root
+			current = this.root;
+			index = 0;
+			while(current.getValue() == -1) {
+				currentLinks = current.getLinks();
+				childs = current.getChildren();
+				position = universe.get(currentQuery.charAt(index));
+				// The element should be here
+				if(currentLinks[position][0] != -1) {
+					
+					// Append the elements of the link
+					sb.append(this.text.substring(currentLinks[position][0], currentLinks[position][1] + 1));
+					
+					// Get the corresponding node
+					current = childs[position];
+					// Update the index on the character to look for
+					index = current.getDepth();
+				}else {
+					System.out.println("FAIL on lookup :c");
+					System.out.println("Asking for char: "+currentQuery.charAt(index)+", on road: "+sb.toString());
+					return false;
+				}
+			}
+			
+			// Compare the elements
+			String recovered = sb.toString();
+			if(recovered.compareTo(currentQuery) != 0) {
+				System.out.println("FAIL on comparison");
+				System.out.println("Recovered: "+recovered+", query: "+currentQuery);
+				return false;
+			}
+		}
+		
+		System.out.println("OK! :)");
+		return true;
+	}
+	
 	// UTILS
 	private int[] generateLCP(int[] aSuffixArray, String aText, int textLength) {
 		int[] R = new int[textLength];

@@ -27,6 +27,7 @@ public class Logger {
 		if(print) {
 			this.bw.println(testName+"::"+test+"::Starting");
 		}
+		System.out.println(testName+"::"+test+"::Starting");
 		testTimes.put(test, System.currentTimeMillis());
 	}
 	

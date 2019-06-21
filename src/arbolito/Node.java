@@ -21,6 +21,14 @@ public class Node {
 		this.value = value;
 		this.links = new int[size][2];
 		this.children = new Node[size];
+		initArrays();
+	}
+	
+	private void initArrays() {
+		for (int i = 0; i < this.links.length; i++) {
+			this.links[i][0] = -1;
+			this.links[i][1] = -1;
+		}
 	}
 	
 	//crea un nodo raiz

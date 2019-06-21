@@ -11,11 +11,12 @@ import arbolito.SuffixTree;
 import experiments.Logger;
 public class Experiments {
 	
-	private static final String filesFolder = "./utils";
+	private static final String filesFolder = "./";
 	private static Logger log;
 	private static final char bottom = '\u0006';
 	private static ArrayList<String> randomStrings;
 	private static final int randomCharLength = 5;
+	private static final boolean DO_TEST = false; 
 	
 	public static String getRandomPattern(int length) {
 		return getRandomPattern(length, false);
@@ -49,10 +50,16 @@ public class Experiments {
 			// Create suffix tree
 			log.startTest("Initialize suffix tree");
 			SuffixTree suffixtree = new SuffixTree(text);
-			suffixtree.checkSuffixTree();
 			// TODO: get size of suffix tree
 			log.logInfo("Initialize suffix tree", "Total size: "); //+st.getSize());
 			log.stopTest("Initialize suffix tree");
+			
+			if(DO_TEST) {
+				System.out.println("DOING TEST!!!");
+				suffixtree.checkSuffixTree();
+				suffixtree.checkSuffixTreeOnLinks();
+				System.out.println("DID TEST!!!");				
+			}
 			
 			// Generate patterns
 			int n = text.length()/10;
@@ -118,17 +125,23 @@ public class Experiments {
 				sb.append((char)index);	
 			}
 			// Add bottom element
-			sb.append(bottom);
+			//sb.append(bottom);
 			
 			String text = sb.toString();
 						
 			// Create suffix tree
 			log.startTest("Initialize suffix tree");
 			SuffixTree suffixtree = new SuffixTree(text);
-			suffixtree.checkSuffixTree();
 			// TODO: get size of suffix tree
 			log.logInfo("Initialize suffix tree", "Total size: "); //+st.getSize());
 			log.stopTest("Initialize suffix tree");
+			
+			if(DO_TEST) {
+				System.out.println("DOING TEST!!!");
+				suffixtree.checkSuffixTree();
+				suffixtree.checkSuffixTreeOnLinks();
+				System.out.println("DID TEST!!!");				
+			}
 			
 			// Generate patterns
 			int n = text.length()/10;
@@ -217,7 +230,7 @@ public class Experiments {
 			log.startTest("File "+englishFiles[i].getName(), true);
 			doEnglish(englishFiles[i]);
 			log.stopTest("File "+englishFiles[i].getName());
-			//System.gc();
+			System.gc();
 		}
 		log.stopTest("English files");
 		
@@ -228,7 +241,7 @@ public class Experiments {
 			log.startTest("File "+englishFiles[i].getName(), true);
 			doDNA(dnaFiles[i]);
 			log.stopTest("File "+englishFiles[i].getName());
-			//System.gc();
+			System.gc();
 		}
 		log.stopTest("DNA files");
 	}
@@ -240,11 +253,27 @@ public class Experiments {
 		//log = new Logger(filesFolder + logName, "SuffixTree", logName);
 		
 		// Run!
-		//doExperiments();		
+		//doExperiments();
 		//log.close();
-
-
-
+		
+		FileReader fr = new FileReader("./dna.50MB_clean_2^17");
+		StringBuilder sb = new StringBuilder();
+		int index;
+		while((index = fr.read()) != -1) {
+			sb.append((char)index);	
+		}
+		// Add bottom element
+		//sb.append(bottom);
+		
+		String text = sb.toString();
+					
+		// Create suffix tree
+		SuffixTree suffixtree = new SuffixTree(text);
+		
+		System.out.println(suffixtree.count("o"));
+		System.out.println(suffixtree.count("a"));
+		System.out.println(suffixtree.count("atata"));
+		
 	}
 
 }
