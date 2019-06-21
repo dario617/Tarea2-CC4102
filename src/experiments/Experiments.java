@@ -16,7 +16,8 @@ public class Experiments {
 	private static final char bottom = '\u0006';
 	private static ArrayList<String> randomStrings;
 	private static final int randomCharLength = 5;
-	private static final boolean DO_TEST = false; 
+	private static final boolean DO_TEST = false;
+	private static Random rnd;
 	
 	public static String getRandomPattern(int length) {
 		return getRandomPattern(length, false);
@@ -25,7 +26,6 @@ public class Experiments {
 	public static String getRandomPattern(int length, boolean dna) {
 		String universe= dna ? "actg" : "abcdefghijklmnopqrstuvwxyz0123456789";
         StringBuilder sb = new StringBuilder();
-        Random rnd = new Random();
         while (sb.length() < length) { // length of the random string.
             int index = (int) (rnd.nextFloat() * universe.length());
             sb.append(universe.charAt(index));
@@ -63,38 +63,43 @@ public class Experiments {
 			
 			// Generate patterns
 			int n = text.length()/10;
-			String[] patterns = text.split("\\s", n);
+			String[] patterns = text.split("\\s", n); // Get all words
+			
 			if(randomStrings.size() < n) {
 				for (int i = randomStrings.size(); i < n; i++) {
 					randomStrings.add(getRandomPattern(randomCharLength));
 				}
 			}
 			
-			// Do queries for count
+			// Do random queries for count
 			log.startTest("Positive Query COUNT");
-			for (int i = 0; i < patterns.length; i++) {
-				suffixtree.count(patterns[i]);
+			for (int i = 0; i < n; i++) {
+				index = rnd.nextInt(n);
+				suffixtree.count(patterns[index]);
 			}
 			log.stopTest("Positive Query COUNT");
 			
 			// Do "miss search" queries
 			log.startTest("Negative Query COUNT");
 			for (int i = 0; i < randomStrings.size(); i++) {
-				suffixtree.count(randomStrings.get(i));
+				index = rnd.nextInt(n);
+				suffixtree.count(randomStrings.get(index));
 			}
 			log.stopTest("Negative Query COUNT");
 			
 			// Do queries for locate
 			log.startTest("Positive Query LOCATE");
-			for (int i = 0; i < patterns.length; i++) {
-				suffixtree.locate(patterns[i]);
+			for (int i = 0; i < n; i++) {
+				index = rnd.nextInt(n);
+				suffixtree.locate(patterns[index]);
 			}
 			log.stopTest("Positive Query LOCATE");
 			
 			// Do "miss search" queries
 			log.startTest("Negative Query LOCATE");
 			for (int i = 0; i < randomStrings.size(); i++) {
-				suffixtree.locate(randomStrings.get(i));
+				index = rnd.nextInt(n);
+				suffixtree.locate(randomStrings.get(index));
 			}
 			log.stopTest("Negative Query LOCATE");
 			
@@ -165,28 +170,32 @@ public class Experiments {
 			// Do queries for count
 			log.startTest("Positive Query COUNT");
 			for (int i = 0; i < patterns.length; i++) {
-				suffixtree.count(patterns[i]);
+				index = rnd.nextInt(n);
+				suffixtree.count(patterns[index]);
 			}
 			log.stopTest("Positive Query COUNT");
 			
 			// Do "miss search" queries
 			log.startTest("Negative Query COUNT");
 			for (int i = 0; i < randomStrings.size(); i++) {
-				suffixtree.count(randomStrings.get(i));
+				index = rnd.nextInt(n);
+				suffixtree.count(randomStrings.get(index));
 			}
 			log.stopTest("Negative Query COUNT");
 			
 			// Do queries for locate
 			log.startTest("Positive Query LOCATE");
 			for (int i = 0; i < patterns.length; i++) {
-				suffixtree.locate(patterns[i]);
+				index = rnd.nextInt(n);
+				suffixtree.locate(patterns[index]);
 			}
 			log.stopTest("Positive Query LOCATE");
 			
 			// Do "miss search" queries
 			log.startTest("Negative Query LOCATE");
 			for (int i = 0; i < randomStrings.size(); i++) {
-				suffixtree.locate(randomStrings.get(i));
+				index = rnd.nextInt(n);
+				suffixtree.locate(randomStrings.get(index));
 			}
 			log.stopTest("Negative Query LOCATE");
 			
@@ -223,6 +232,9 @@ public class Experiments {
 		    }
 		});
 		
+		// Set random
+		rnd = new Random();
+		rnd.setSeed(System.currentTimeMillis());
 		randomStrings = new ArrayList<String>();
 		
 		log.startTest("English files", true);
