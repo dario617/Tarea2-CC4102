@@ -12,6 +12,7 @@ class SuffixTreeTest {
 	
 	private String s1 = "abacabadacaba";
 	private String s2 = "el zorro rorro es muy porro pero le gusta subir el morro desde cachorro con su chaqueta de chiporro";
+	private String s3 = "banana";
 
 	@Test
 	public void creationTest() {
@@ -75,6 +76,20 @@ class SuffixTreeTest {
 			
 			for (int j = 0; j < ans.size(); j++) {
 				assertEquals(actual.get(j), ans.get(j));
+			}
+		}
+	}
+	
+	@Test
+	public void verifyTopKQ() {
+		SuffixTree st1 = new SuffixTree(s3);
+		int[] q = {2};
+		int[] k = {2};
+		ArrayList<String> ans;
+		for (int i = 0; i < q.length; i++) {
+			for (int j = 0; j < k.length; j++) {
+				ans = st1.topKQ(k[j], q[i]);
+				System.out.println(ans.toString());
 			}
 		}
 	}

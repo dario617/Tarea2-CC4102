@@ -372,7 +372,7 @@ public class SuffixTree {
 			ans[qkPos][0] = stringInit;
 			ans[qkPos][1] = stringEnd;
 			
-			count[qkPos] = n.setNBChildren();
+			count[qkPos] = n.getNBChildren();
 			
 			qkPos++;
 		}
