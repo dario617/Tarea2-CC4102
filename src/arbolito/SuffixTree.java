@@ -229,33 +229,7 @@ public class SuffixTree {
 				}
 			}
 		}
-		int counter = 0;
-		// El nodo actual era una hoja
-		if (currentNode.getValue() >= 0) {
-			counter += 1;
-			return counter;
-		}
-		Stack<Node> stack = new Stack<Node>();
-		// Metemos todos lo nodos de currentNode al stack
-		for (int i = 0; i < currentNode.getChildren().length; i++) {
-			if(!Objects.isNull(currentNode.getChildren()[i])) {
-				stack.push(currentNode.getChildren()[i]);
-			}
-		}
-		while (!stack.isEmpty()) {
-			currentNode = stack.pop();
-			if (currentNode.getValue() >= 0) {
-				counter += 1;
-			} 
-			else {
-				for (int i = 0; i < currentNode.getChildren().length; i++) {
-					if(!Objects.isNull(currentNode.getChildren()[i])) {
-						stack.push(currentNode.getChildren()[i]);
-					}
-				}
-			}
-		}
-		return counter;
+		return currentNode.getNBChildren();
 	}
 
 	public ArrayList<Integer> locate(String query) {
