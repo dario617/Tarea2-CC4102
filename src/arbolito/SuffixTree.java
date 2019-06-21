@@ -23,12 +23,12 @@ public class SuffixTree {
 		}
 
 		@Override
+		// Compare in reverse
 		public int compareTo(MyPair o) {
-			// TODO Auto-generated method stub
 			int cmp;
-			if (first> o.first)
+			if (first < o.first)
 			   cmp = +1;
-			else if (first< o.first)
+			else if (first > o.first)
 			   cmp = -1;
 			else
 			   cmp = 0;
@@ -341,6 +341,7 @@ public class SuffixTree {
 		}
 		
 		topKQHelper(root, q, indices, count);
+		System.out.println("Did it!");
 		
 		// Get top K
 		MyPair[] myPairs = new MyPair[qkPos];
@@ -356,7 +357,7 @@ public class SuffixTree {
 		for (int i = 0; i < k && i < qkPos; i++) {
 			init = indices[myPairs[i].second][0];
 			end = indices[myPairs[i].second][1];
-			ans.add(text.substring(init,end+1));
+			ans.add(text.substring(init,end));
 		}
 		
 		return ans;
@@ -368,7 +369,9 @@ public class SuffixTree {
 			// Do a recursive step on children
 			Node[] children = n.getChildren();
 			for (int i = 0; i < children.length; i++) {
-				topKQHelper(children[i], q, ans, count);
+				if(children[i] != null) {
+					topKQHelper(children[i], q, ans, count);					
+				}
 			}
 		// Else we can add up the results
 		}else {
@@ -377,8 +380,8 @@ public class SuffixTree {
 			// Get a child with a valid index
 			Node current = n;
 			Node[] currentChildren;
-			while(current.getValue() != -1) {
-				currentChildren = n.getChildren();
+			while(current.getValue() == -1) {
+				currentChildren = current.getChildren();
 				for (int i = 0; i < currentChildren.length; i++) {
 					if(currentChildren[i] != null) {
 						current = currentChildren[i];

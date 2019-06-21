@@ -89,7 +89,9 @@ class SuffixTreeTest {
 		for (int i = 0; i < q.length; i++) {
 			for (int j = 0; j < k.length; j++) {
 				ans = st1.topKQ(k[j], q[i]);
-				System.out.println(ans.toString());
+				if(ans != null) {
+					System.out.println(ans.toString());
+				}
 			}
 		}
 	}

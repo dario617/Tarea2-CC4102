@@ -268,24 +268,24 @@ public class Experiments {
 		//doExperiments();
 		//log.close();
 		
-		FileReader fr = new FileReader("./dna.50MB_clean_2^17");
-		StringBuilder sb = new StringBuilder();
-		int index;
-		while((index = fr.read()) != -1) {
-			sb.append((char)index);	
-		}
-		// Add bottom element
-		//sb.append(bottom);
-		
-		String text = sb.toString();
-					
-		// Create suffix tree
-		SuffixTree suffixtree = new SuffixTree(text);
-		
-		System.out.println(suffixtree.count("o"));
-		System.out.println(suffixtree.count("a"));
-		System.out.println(suffixtree.count("atata"));
-		
+//		FileReader fr = new FileReader("./dna.50MB_clean_2^17");
+//		StringBuilder sb = new StringBuilder();
+//		int index;
+//		while((index = fr.read()) != -1) {
+//			sb.append((char)index);	
+//		}
+//		// Add bottom element
+//		//sb.append(bottom);
+//		
+//		String text = sb.toString();
+//					
+//		// Create suffix tree
+//		SuffixTree suffixtree = new SuffixTree(text);
+//		
+//		System.out.println(suffixtree.count("o"));
+//		System.out.println(suffixtree.count("a"));
+//		System.out.println(suffixtree.count("atata"));
+//		System.out.println(suffixtree.topKQ(100, 10010).toString());		
 	}
 
 }
