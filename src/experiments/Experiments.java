@@ -50,8 +50,6 @@ public class Experiments {
 			// Create suffix tree
 			log.startTest("Initialize suffix tree");
 			SuffixTree suffixtree = new SuffixTree(text);
-			// TODO: get size of suffix tree
-			log.logInfo("Initialize suffix tree", "Total size: "); //+st.getSize());
 			log.stopTest("Initialize suffix tree");
 			
 			if(DO_TEST) {
@@ -109,7 +107,9 @@ public class Experiments {
 			log.startTest("Top-k-q queries");
 			for (int i = 0; i < q.length; i++) {
 				for (int j = 0; j < k.length; j++) {
+					log.startTest("Top-k-q q="+q[i]+",k="+k[j]);
 					suffixtree.topKQ(k[j], q[i]);
+					log.stopTest("Top-k-q q="+q[i]+",k="+k[j]);
 				}
 			}
 			log.stopTest("Top-k-q queries");
@@ -120,7 +120,7 @@ public class Experiments {
 		}
 	}
 	
-	public static void doDNA(File f) {
+	public static void doDNA(File f, boolean doCountTests) {
 		try {
 			// Recover text
 			FileReader fr = new FileReader(f);
@@ -137,8 +137,6 @@ public class Experiments {
 			// Create suffix tree
 			log.startTest("Initialize suffix tree");
 			SuffixTree suffixtree = new SuffixTree(text);
-			// TODO: get size of suffix tree
-			log.logInfo("Initialize suffix tree", "Total size: "); //+st.getSize());
 			log.stopTest("Initialize suffix tree");
 			
 			if(DO_TEST) {
@@ -148,56 +146,66 @@ public class Experiments {
 				System.out.println("DID TEST!!!");				
 			}
 			
-			// Generate patterns
-			int n = text.length()/10;
-			int count = 0, left, right;
-			String[] patterns = new String[n];
-			Random rnd = new Random();
-			// n patterns, of variable size
-			while(count < n) {
-				right = (int)Math.pow(2, rnd.nextInt(5)+1);
-				left = rnd.nextInt(text.length() - 32) + 1;
-				patterns[count] = text.substring(left,left + right);
-				count++;
-			}
-			
-			if(randomStrings.size() < n) {
-				for (int i = randomStrings.size(); i < n; i++) {
-					randomStrings.add(getRandomPattern(randomCharLength,true));
+			if(doCountTests) {
+				
+				// Generate patterns
+				int n = text.length()/10;
+				int count, left, right;
+				String[] patterns = new String[n];
+				Random rnd = new Random();
+				// n patterns, of variable size
+				int[] sizes = {8,16,32,64};
+				
+				for (int i = 0; i < sizes.length; i++) {
+					// Create the substrings of current size
+					count = 0;
+					while(count < n) {
+						right = sizes[i];
+						left = rnd.nextInt(text.length() - sizes[i]) + 1;
+						patterns[count] = text.substring(left,left + right);
+						count++;
+					}
+					System.out.println("Created valid patterns");
+					// and random strings of size
+					randomStrings = new ArrayList<String>(n);
+					for (int j = randomStrings.size(); j < n; j++) {
+						randomStrings.add(getRandomPattern(sizes[i],true));
+					}
+					System.out.println("Created random patterns");
+					
+					// Do queries for count
+					log.startTest("Positive Query COUNT for patterns size="+sizes[i]);
+					for (int j = 0; j < patterns.length; j++) {
+						index = rnd.nextInt(n);
+						suffixtree.count(patterns[index]);
+					}
+					log.stopTest("Positive Query COUNT for patterns size="+sizes[i]);
+					
+					// Do "miss search" queries
+					log.startTest("Negative Query COUNT for patterns size="+sizes[i]);
+					for (int j = 0; j < randomStrings.size(); j++) {
+						index = rnd.nextInt(n);
+						suffixtree.count(randomStrings.get(index));
+					}
+					log.stopTest("Negative Query COUNT for patterns size="+sizes[i]);
+					
+					// Do queries for locate
+					log.startTest("Positive Query LOCATE for patterns size="+sizes[i]);
+					for (int j = 0; j < patterns.length; j++) {
+						index = rnd.nextInt(n);
+						suffixtree.locate(patterns[index]);
+					}
+					log.stopTest("Positive Query LOCATE for patterns size="+sizes[i]);
+					
+					// Do "miss search" queries
+					log.startTest("Negative Query LOCATE for patterns size="+sizes[i]);
+					for (int j = 0; j < randomStrings.size(); j++) {
+						index = rnd.nextInt(n);
+						suffixtree.locate(randomStrings.get(index));
+					}
+					log.stopTest("Negative Query LOCATE for patterns size="+sizes[i]);				
 				}
 			}
-			
-			// Do queries for count
-			log.startTest("Positive Query COUNT");
-			for (int i = 0; i < patterns.length; i++) {
-				index = rnd.nextInt(n);
-				suffixtree.count(patterns[index]);
-			}
-			log.stopTest("Positive Query COUNT");
-			
-			// Do "miss search" queries
-			log.startTest("Negative Query COUNT");
-			for (int i = 0; i < randomStrings.size(); i++) {
-				index = rnd.nextInt(n);
-				suffixtree.count(randomStrings.get(index));
-			}
-			log.stopTest("Negative Query COUNT");
-			
-			// Do queries for locate
-			log.startTest("Positive Query LOCATE");
-			for (int i = 0; i < patterns.length; i++) {
-				index = rnd.nextInt(n);
-				suffixtree.locate(patterns[index]);
-			}
-			log.stopTest("Positive Query LOCATE");
-			
-			// Do "miss search" queries
-			log.startTest("Negative Query LOCATE");
-			for (int i = 0; i < randomStrings.size(); i++) {
-				index = rnd.nextInt(n);
-				suffixtree.locate(randomStrings.get(index));
-			}
-			log.stopTest("Negative Query LOCATE");
 			
 			int[] k = {3,5,10};
 			int[] q = {4,8,16,32};
@@ -205,7 +213,9 @@ public class Experiments {
 			log.startTest("Top-k-q queries");
 			for (int i = 0; i < q.length; i++) {
 				for (int j = 0; j < k.length; j++) {
+					log.startTest("Top-k-q q="+q[i]+",k="+k[j]);
 					suffixtree.topKQ(k[j], q[i]);
+					log.stopTest("Top-k-q q="+q[i]+",k="+k[j]);
 				}
 			}
 			log.stopTest("Top-k-q queries");
@@ -249,10 +259,15 @@ public class Experiments {
 		randomStrings = new ArrayList<String>();
 		
 		log.startTest("DNA files", true);
-		for (int i = 0; i < dnaFiles.length; i++) {
-			log.startTest("File "+englishFiles[i].getName(), true);
-			doDNA(dnaFiles[i]);
-			log.stopTest("File "+englishFiles[i].getName());
+		for (int i = 12; i < dnaFiles.length - 1; i++) {
+			log.startTest("File "+dnaFiles[i].getName(), true);
+			// On final iter do tests (2^22)
+			// (Como dijo el auxiliar)
+			if(i + 2 == dnaFiles.length){ 
+				doDNA(dnaFiles[i], true);				
+			}
+			doDNA(dnaFiles[i], false);
+			log.stopTest("File "+dnaFiles[i].getName());
 			System.gc();
 		}
 		log.stopTest("DNA files");
@@ -262,30 +277,11 @@ public class Experiments {
 		
 		// Initialize
 		String logName = System.currentTimeMillis() + ".log";
-		//log = new Logger(filesFolder + logName, "SuffixTree", logName);
+		log = new Logger(filesFolder + logName, "SuffixTree", logName);
 		
 		// Run!
-		//doExperiments();
-		//log.close();
-		
-//		FileReader fr = new FileReader("./dna.50MB_clean_2^17");
-//		StringBuilder sb = new StringBuilder();
-//		int index;
-//		while((index = fr.read()) != -1) {
-//			sb.append((char)index);	
-//		}
-//		// Add bottom element
-//		//sb.append(bottom);
-//		
-//		String text = sb.toString();
-//					
-//		// Create suffix tree
-//		SuffixTree suffixtree = new SuffixTree(text);
-//		
-//		System.out.println(suffixtree.count("o"));
-//		System.out.println(suffixtree.count("a"));
-//		System.out.println(suffixtree.count("atata"));
-//		System.out.println(suffixtree.topKQ(100, 10010).toString());		
+		doExperiments();
+		log.close();
 	}
 
 }

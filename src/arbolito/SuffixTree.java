@@ -315,7 +315,6 @@ public class SuffixTree {
 		}
 		
 		topKQHelper(root, q, indices, count);
-		System.out.println("Did it!");
 		
 		// Get top K
 		MyPair[] myPairs = new MyPair[qkPos];
